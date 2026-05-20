@@ -1,11 +1,11 @@
 import app from "./app/app";
+import { config } from "./config/config";
 import { initDB } from "./db";
 
-const port = 5000;
 const main = () => {
   initDB();
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+  app.listen(config.PORT, () => {
+    console.log(`Example app listening on port ${config.PORT}`);
   });
 };
 
