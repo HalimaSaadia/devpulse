@@ -1,13 +1,12 @@
-
-import {Pool} from "pg"
+import { Pool } from "pg";
 import { config } from "../config/config";
 export const pool = new Pool({
-  connectionString:config.CONNECTION_STRING,
+  connectionString: config.CONNECTION_STRING,
 });
 
 export const initDB = async () => {
-    try {
-  pool.query(`
+  try {
+    pool.query(`
     CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -17,8 +16,20 @@ export const initDB = async () => {
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
     )`);
-  console.log("Successfully created collection");
-} catch (err) {
-  console.error("Error creating users table:", err);
-}
-}
+    
+    pool.query(`
+    CREATE TABLE IF NOT EXISTS issues (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(150) NOT NULL,
+        description TEXT CHECK (LENGTH(description) >= 50) NOT NULL,
+        type VARCHAR(255) CHECK (type IN ('bug', 'feature_request')),
+        status VARCHAR(255)  CHECK (status IN ('open', 'in_progress', 'resolved')) DEFAULT 'open',
+        reporter_id VARCHAR(50) NOT NULL ,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+    )`);
+    console.log("Successfully created collection");
+  } catch (err) {
+    console.error("Error creating users table:", err);
+  }
+};
