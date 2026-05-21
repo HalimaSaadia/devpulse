@@ -60,3 +60,18 @@ export const getIssuesFromBD = async (
 
   return issuesWithReporter;
 };
+
+export const getIssueByIdFromDB = async (id: string) => {
+  const result = await pool.query("SELECT * FROM issues WHERE id = $1", [id]);
+  if (result.rowCount === 0) {
+    throw new Error("Issue not found");
+  }
+  const reporterId = result.rows[0].reporter_id;
+  const userData = await pool.query(
+    "SELECT id, name, role FROM users WHERE id = $1",
+    [Number(reporterId)],
+  );
+  delete result.rows[0].reporter_id;
+  result.rows[0].reporter = userData.rows[0];
+  return result.rows[0];
+};

@@ -1,5 +1,9 @@
 import type { Request, Response } from "express";
-import { createIssuesInBD, getIssuesFromBD } from "./issues.service";
+import {
+  createIssuesInBD,
+  getIssueByIdFromDB,
+  getIssuesFromBD,
+} from "./issues.service";
 
 export const createIssue = async (req: Request, res: Response) => {
   try {
@@ -25,11 +29,33 @@ export const createIssue = async (req: Request, res: Response) => {
 export const getAllIssues = async (req: Request, res: Response) => {
   try {
     const { sort, type, status } = req.query;
-    const issues = await getIssuesFromBD(sort, type, status);
+    const issues = await getIssuesFromBD(
+      sort as string,
+      type as string,
+      status as string,
+    );
 
     res.status(200).json({
       success: true,
       message: "Issues retrieved successfully",
+      data: issues,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: "Failed to retrieve issues",
+      message: error.message,
+    });
+  }
+};
+
+export const getIssueById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const issues = await getIssueByIdFromDB(id as string);
+
+    res.status(200).json({
+      success: true,
       data: issues,
     });
   } catch (error: any) {
