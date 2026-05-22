@@ -3,6 +3,7 @@ import {
   createIssuesInBD,
   getIssueByIdFromDB,
   getIssuesFromBD,
+  updateIssueInDB,
 } from "./issues.service";
 
 export const createIssue = async (req: Request, res: Response) => {
@@ -66,3 +67,25 @@ export const getIssueById = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const updateIssue = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const payload = req.body;
+    const { role: userRole , id: userId} = req.user;
+    
+    const updatedIssue = await updateIssueInDB(id as string, payload, userRole, userId );
+
+    res.status(200).json({
+      success: true,
+      message: "Issue updated successfully",
+      data: updatedIssue,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: "Failed to update issue",
+      message: error.message,
+    });
+  }
+}

@@ -75,3 +75,53 @@ export const getIssueByIdFromDB = async (id: string) => {
   result.rows[0].reporter = userData.rows[0];
   return result.rows[0];
 };
+export const updateIssueInDB = async (
+  id: string,
+  payload: Partial<IIssue>,
+  userRole: string,
+  userId: string,
+) => {
+  const { title, description, status, type } = payload;
+
+  const existingIssueResult = await pool.query(
+    `
+    SELECT * FROM issues
+    WHERE id = $1
+    `,
+    [id],
+  );
+
+  if (existingIssueResult.rowCount === 0) {
+    throw new Error("Issue not found");
+  }
+  const existingIssue = existingIssueResult.rows[0];
+  const isMaintainer = userRole === "maintainer";
+  const isContributorOwner =
+    userRole === "contributor" &&
+    existingIssue.reporter_id == userId &&
+    existingIssue.status === "open";
+
+  if (!isMaintainer && !isContributorOwner) {
+    throw new Error("You are not authorized to update this issue");
+  }
+
+ 
+
+  const result = await pool.query(
+    `
+        UPDATE issues
+        SET title = COALESCE($1, title),
+            description = COALESCE($2, description),
+            status = COALESCE($3, status),
+            type = COALESCE($4, type)
+        WHERE id = $5
+        RETURNING *
+      `,
+    [title, description, status, type, id],
+  );
+  if (result.rowCount === 0) {
+    throw new Error("Issue not found");
+  }
+
+  return result.rows[0];
+};
