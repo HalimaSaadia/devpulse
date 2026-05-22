@@ -105,8 +105,6 @@ export const updateIssueInDB = async (
     throw new Error("You are not authorized to update this issue");
   }
 
- 
-
   const result = await pool.query(
     `
         UPDATE issues
@@ -124,4 +122,29 @@ export const updateIssueInDB = async (
   }
 
   return result.rows[0];
+};
+
+export const deleteIssueFromDB = async (id: string, role: string) => {
+  
+  if (role !== "maintainer") {
+    throw new Error("Forbidden Access");
+  }
+  const existingIssueResult = await pool.query(
+    `
+    SELECT * FROM issues
+    WHERE id = $1
+    `,
+    [id],
+  );
+  if (existingIssueResult.rowCount === 0) {
+    throw new Error("Issue not found");
+  }
+  const result = pool.query(
+    `
+  DELETE FROM issues
+  WHERE id = $1
+  `,
+    [id],
+  );
+  return result;
 };

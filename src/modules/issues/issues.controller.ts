@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import {
   createIssuesInBD,
+  deleteIssueFromDB,
   getIssueByIdFromDB,
   getIssuesFromBD,
   updateIssueInDB,
@@ -72,9 +73,14 @@ export const updateIssue = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const payload = req.body;
-    const { role: userRole , id: userId} = req.user;
-    
-    const updatedIssue = await updateIssueInDB(id as string, payload, userRole, userId );
+    const { role: userRole, id: userId } = req.user;
+
+    const updatedIssue = await updateIssueInDB(
+      id as string,
+      payload,
+      userRole,
+      userId,
+    );
 
     res.status(200).json({
       success: true,
@@ -88,4 +94,23 @@ export const updateIssue = async (req: Request, res: Response) => {
       message: error.message,
     });
   }
-}
+};
+
+
+export const deleteIssue = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.user;
+    const result = await deleteIssueFromDB(id as string, role);
+    res.status(200).json({
+      success: true,
+      message: "Issue deleted successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: "Failed to delete issue",
+      message: error.message,
+    });
+  }
+};

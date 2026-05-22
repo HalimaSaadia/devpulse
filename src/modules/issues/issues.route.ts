@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createIssue,
+  deleteIssue,
   getAllIssues,
   getIssueById,
   updateIssue,
@@ -13,4 +14,5 @@ router.get("/", getAllIssues);
 router.post("/", auth(), createIssue);
 router.get("/:id", getIssueById);
 router.patch("/:id", auth(), updateIssue);
+router.delete("/:id", auth(), deleteIssue);
 export const issuesRouter = router;
