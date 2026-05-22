@@ -36,6 +36,9 @@ export const getIssuesFromBD = async (
     [type || null, status || null],
   );
   const issues = issueResult.rows;
+  if (issueResult.rowCount == 0) {
+    throw new Error("No issues found");
+  }
   const reporterIds = [...new Set(issues.map((i) => i.reporter_id))];
 
   const usersResult = await pool.query(

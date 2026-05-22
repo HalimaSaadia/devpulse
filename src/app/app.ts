@@ -10,7 +10,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/issues", issuesRouter);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!");
+  res.json({
+    message: "server is running",
+  });
 });
 
 export default app;
