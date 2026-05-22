@@ -6,6 +6,7 @@ import {
   getIssuesFromBD,
   updateIssueInDB,
 } from "./issues.service";
+import { sendResponse } from "../../utility/sendResponse";
 
 export const createIssue = async (req: Request, res: Response) => {
   try {
@@ -15,19 +16,22 @@ export const createIssue = async (req: Request, res: Response) => {
     };
     const issue = await createIssuesInBD(payload);
 
-    res.status(201).json({
+    sendResponse(res, {
+      status: 201,
       success: true,
       message: "Issue created successfully",
       data: issue,
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      status: 500,
       success: false,
-      error: "Internal server error",
       message: error.message,
+      errors: error,
     });
   }
 };
+
 export const getAllIssues = async (req: Request, res: Response) => {
   try {
     const { sort, type, status } = req.query;
@@ -37,16 +41,18 @@ export const getAllIssues = async (req: Request, res: Response) => {
       status as string,
     );
 
-    res.status(200).json({
+    sendResponse(res, {
+      status: 200,
       success: true,
       message: "Issues retrieved successfully",
       data: issues,
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      status: 500,
       success: false,
-      error: "Failed to retrieve issues",
       message: error.message,
+      errors: error,
     });
   }
 };
@@ -56,15 +62,18 @@ export const getIssueById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const issues = await getIssueByIdFromDB(id as string);
 
-    res.status(200).json({
+    sendResponse(res, {
+      status: 200,
       success: true,
+      message: "Issue retrieved successfully",
       data: issues,
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      status: 500,
       success: false,
-      error: "Failed to retrieve issues",
       message: error.message,
+      errors: error,
     });
   }
 };
@@ -82,34 +91,36 @@ export const updateIssue = async (req: Request, res: Response) => {
       userId,
     );
 
-    res.status(200).json({
+    sendResponse(res, {
+      status: 200,
       success: true,
       message: "Issue updated successfully",
       data: updatedIssue,
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      status: 500,
       success: false,
-      error: "Failed to update issue",
       message: error.message,
+      errors: error,
     });
   }
 };
-
 
 export const deleteIssue = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { role } = req.user;
     const result = await deleteIssueFromDB(id as string, role);
-    res.status(200).json({
+    sendResponse(res, {
+      status: 200,
       success: true,
       message: "Issue deleted successfully",
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      status: 500,
       success: false,
-      error: "Failed to delete issue",
       message: error.message,
     });
   }

@@ -125,7 +125,6 @@ export const updateIssueInDB = async (
 };
 
 export const deleteIssueFromDB = async (id: string, role: string) => {
-  
   if (role !== "maintainer") {
     throw new Error("Forbidden Access");
   }
